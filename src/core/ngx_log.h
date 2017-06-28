@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//日志等级
 #define NGX_LOG_STDERR            0
 #define NGX_LOG_EMERG             1
 #define NGX_LOG_ALERT             2
@@ -22,7 +22,7 @@
 #define NGX_LOG_NOTICE            6
 #define NGX_LOG_INFO              7
 #define NGX_LOG_DEBUG             8
-
+//每个模块对应的日志等级
 #define NGX_LOG_DEBUG_CORE        0x010
 #define NGX_LOG_DEBUG_ALLOC       0x020
 #define NGX_LOG_DEBUG_MUTEX       0x040
@@ -41,25 +41,27 @@
 #define NGX_LOG_DEBUG_CONNECTION  0x80000000
 #define NGX_LOG_DEBUG_ALL         0x7ffffff0
 
-
+//log函数指针
 typedef u_char *(*ngx_log_handler_pt) (ngx_log_t *log, u_char *buf, size_t len);
-typedef void (*ngx_log_writer_pt) (ngx_log_t *log, ngx_uint_t level,
+typedef void (*ngx_log_writer_pt) (ngx_log_t *log, ngx_uint_t level,//写日志函数指针
     u_char *buf, size_t len);
 
 
-struct ngx_log_s {
-    ngx_uint_t           log_level;
-    ngx_open_file_t     *file;
+//日志结构体
+struct ngx_log_s 
+{
+    ngx_uint_t           log_level;//日志等级
+    ngx_open_file_t     *file;      //打开的日志文件
 
     ngx_atomic_uint_t    connection;
 
-    time_t               disk_full_time;
+    time_t               disk_full_time;//磁盘满的时间
 
-    ngx_log_handler_pt   handler;
-    void                *data;
+    ngx_log_handler_pt   handler;//日志处理函数
+    void                *data;//数据
 
-    ngx_log_writer_pt    writer;
-    void                *wdata;
+    ngx_log_writer_pt    writer;//写数据函数
+    void                *wdata;//数据
 
     /*
      * we declare "action" as "char *" because the actions are usually
@@ -69,10 +71,10 @@ struct ngx_log_s {
 
     char                *action;
 
-    ngx_log_t           *next;
+    ngx_log_t           *next;//下一个log
 };
 
-
+//最大错误字符串的长度
 #define NGX_MAX_ERROR_STR   2048
 
 
@@ -81,13 +83,13 @@ struct ngx_log_s {
 #if (NGX_HAVE_C99_VARIADIC_MACROS)
 
 #define NGX_HAVE_VARIADIC_MACROS  1
-
+//ngx_log_error传入等级小于当前日志的等级就打印
 #define ngx_log_error(level, log, ...)                                        \
     if ((log)->log_level >= level) ngx_log_error_core(level, log, __VA_ARGS__)
 
 void ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
     const char *fmt, ...);
-
+//如果传入等级与等级做位于不为0就打印
 #define ngx_log_debug(level, log, ...)                                        \
     if ((log)->log_level & level)                                             \
         ngx_log_error_core(NGX_LOG_DEBUG, log, __VA_ARGS__)
@@ -227,15 +229,15 @@ void ngx_cdecl ngx_log_debug_core(ngx_log_t *log, ngx_err_t err,
 #endif
 
 /*********************************/
-
+//log初始化
 ngx_log_t *ngx_log_init(u_char *prefix);
-void ngx_cdecl ngx_log_abort(ngx_err_t err, const char *fmt, ...);
-void ngx_cdecl ngx_log_stderr(ngx_err_t err, const char *fmt, ...);
-u_char *ngx_log_errno(u_char *buf, u_char *last, ngx_err_t err);
-ngx_int_t ngx_log_open_default(ngx_cycle_t *cycle);
-ngx_int_t ngx_log_redirect_stderr(ngx_cycle_t *cycle);
-ngx_log_t *ngx_log_get_file_log(ngx_log_t *head);
-char *ngx_log_set_log(ngx_conf_t *cf, ngx_log_t **head);
+void ngx_cdecl ngx_log_abort(ngx_err_t err, const char *fmt, ...);//中断
+void ngx_cdecl ngx_log_stderr(ngx_err_t err, const char *fmt, ...);//标准出错
+u_char *ngx_log_errno(u_char *buf, u_char *last, ngx_err_t err);//错误码
+ngx_int_t ngx_log_open_default(ngx_cycle_t *cycle);//打开默认
+ngx_int_t ngx_log_redirect_stderr(ngx_cycle_t *cycle);//重定向标准出错
+ngx_log_t *ngx_log_get_file_log(ngx_log_t *head);//获取文件日志
+char *ngx_log_set_log(ngx_conf_t *cf, ngx_log_t **head);//设置日志
 
 
 /*
@@ -247,20 +249,20 @@ char *ngx_log_set_log(ngx_conf_t *cf, ngx_log_t **head);
  * read only buffer as destination and CharToOemBuff() is not needed
  * for ngx_write_stderr() anyway.
  */
-static ngx_inline void
+static ngx_inline void//写日志到标准出错
 ngx_write_stderr(char *text)
 {
     (void) ngx_write_fd(ngx_stderr, text, ngx_strlen(text));
 }
 
-
+//写日志到标准输出
 static ngx_inline void
 ngx_write_stdout(char *text)
 {
     (void) ngx_write_fd(ngx_stdout, text, ngx_strlen(text));
 }
 
-
+//声明变量
 extern ngx_module_t  ngx_errlog_module;
 extern ngx_uint_t    ngx_use_stderr;
 

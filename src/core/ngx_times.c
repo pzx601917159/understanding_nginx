@@ -59,8 +59,8 @@ static char  *week[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 static char  *months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-void
-ngx_time_init(void)
+//初始化时间
+void ngx_time_init(void)
 {
     ngx_cached_err_log_time.len = sizeof("1970/09/28 12:00:00") - 1;
     ngx_cached_http_time.len = sizeof("Mon, 28 Sep 1970 06:00:00 GMT") - 1;
@@ -73,9 +73,8 @@ ngx_time_init(void)
     ngx_time_update();
 }
 
-
-void
-ngx_time_update(void)
+//更新时间
+void ngx_time_update(void)
 {
     u_char          *p0, *p1, *p2, *p3, *p4;
     ngx_tm_t         tm, gmt;
@@ -84,45 +83,62 @@ ngx_time_update(void)
     ngx_time_t      *tp;
     struct timeval   tv;
 
-    if (!ngx_trylock(&ngx_time_lock)) {
+    //加锁
+    if (!ngx_trylock(&ngx_time_lock)) 
+    {
         return;
     }
 
+    //获取时间
     ngx_gettimeofday(&tv);
 
     sec = tv.tv_sec;
     msec = tv.tv_usec / 1000;
 
+    //毫秒时间戳
     ngx_current_msec = (ngx_msec_t) sec * 1000 + msec;
 
+    //slot默认初始化为0
     tp = &cached_time[slot];
 
-    if (tp->sec == sec) {
+    if (tp->sec == sec) 
+    {
         tp->msec = msec;
         ngx_unlock(&ngx_time_lock);
         return;
     }
 
-    if (slot == NGX_TIME_SLOTS - 1) {
+    //重新利用
+    if (slot == NGX_TIME_SLOTS - 1) 
+    {
         slot = 0;
-    } else {
+    } 
+    else 
+    {
+        //slot+1
         slot++;
     }
 
     tp = &cached_time[slot];
 
+    //赋值
     tp->sec = sec;
     tp->msec = msec;
 
+    //得到格林威治时间
     ngx_gmtime(sec, &gmt);
-
 
     p0 = &cached_http_time[slot][0];
 
+    //p0 年月日十分秒
     (void) ngx_sprintf(p0, "%s, %02d %s %4d %02d:%02d:%02d GMT",
-                       week[gmt.ngx_tm_wday], gmt.ngx_tm_mday,
-                       months[gmt.ngx_tm_mon - 1], gmt.ngx_tm_year,
-                       gmt.ngx_tm_hour, gmt.ngx_tm_min, gmt.ngx_tm_sec);
+                       week[gmt.ngx_tm_wday], 
+                       gmt.ngx_tm_mday,
+                       months[gmt.ngx_tm_mon - 1], 
+                       gmt.ngx_tm_year,
+                       gmt.ngx_tm_hour, 
+                       gmt.ngx_tm_min, 
+                       gmt.ngx_tm_sec);
 
 #if (NGX_HAVE_GETTIMEZONE)
 
@@ -147,35 +163,50 @@ ngx_time_update(void)
     p1 = &cached_err_log_time[slot][0];
 
     (void) ngx_sprintf(p1, "%4d/%02d/%02d %02d:%02d:%02d",
-                       tm.ngx_tm_year, tm.ngx_tm_mon,
-                       tm.ngx_tm_mday, tm.ngx_tm_hour,
-                       tm.ngx_tm_min, tm.ngx_tm_sec);
+                       tm.ngx_tm_year, 
+                       tm.ngx_tm_mon,
+                       tm.ngx_tm_mday, 
+                       tm.ngx_tm_hour,
+                       tm.ngx_tm_min, 
+                       tm.ngx_tm_sec);
 
 
     p2 = &cached_http_log_time[slot][0];
 
     (void) ngx_sprintf(p2, "%02d/%s/%d:%02d:%02d:%02d %c%02i%02i",
-                       tm.ngx_tm_mday, months[tm.ngx_tm_mon - 1],
-                       tm.ngx_tm_year, tm.ngx_tm_hour,
-                       tm.ngx_tm_min, tm.ngx_tm_sec,
+                       tm.ngx_tm_mday, 
+                       months[tm.ngx_tm_mon - 1],
+                       tm.ngx_tm_year, 
+                       tm.ngx_tm_hour,
+                       tm.ngx_tm_min, 
+                       tm.ngx_tm_sec,
                        tp->gmtoff < 0 ? '-' : '+',
-                       ngx_abs(tp->gmtoff / 60), ngx_abs(tp->gmtoff % 60));
+                       ngx_abs(tp->gmtoff / 60), 
+                       ngx_abs(tp->gmtoff % 60));
 
     p3 = &cached_http_log_iso8601[slot][0];
 
     (void) ngx_sprintf(p3, "%4d-%02d-%02dT%02d:%02d:%02d%c%02i:%02i",
-                       tm.ngx_tm_year, tm.ngx_tm_mon,
-                       tm.ngx_tm_mday, tm.ngx_tm_hour,
-                       tm.ngx_tm_min, tm.ngx_tm_sec,
+                       tm.ngx_tm_year, 
+                       tm.ngx_tm_mon,
+                       tm.ngx_tm_mday, 
+                       tm.ngx_tm_hour,
+                       tm.ngx_tm_min, 
+                       tm.ngx_tm_sec,
                        tp->gmtoff < 0 ? '-' : '+',
-                       ngx_abs(tp->gmtoff / 60), ngx_abs(tp->gmtoff % 60));
+                       ngx_abs(tp->gmtoff / 60), 
+                       ngx_abs(tp->gmtoff % 60));
 
     p4 = &cached_syslog_time[slot][0];
 
     (void) ngx_sprintf(p4, "%s %2d %02d:%02d:%02d",
-                       months[tm.ngx_tm_mon - 1], tm.ngx_tm_mday,
-                       tm.ngx_tm_hour, tm.ngx_tm_min, tm.ngx_tm_sec);
+                       months[tm.ngx_tm_mon - 1], 
+                       tm.ngx_tm_mday,
+                       tm.ngx_tm_hour, 
+                       tm.ngx_tm_min, 
+                       tm.ngx_tm_sec);
 
+    //内存屏障,保证代码有序，上面的代码先执行，下面的代码后执行
     ngx_memory_barrier();
 
     ngx_cached_time = tp;
@@ -295,9 +326,8 @@ ngx_http_cookie_time(u_char *buf, time_t t)
                        tm.ngx_tm_sec);
 }
 
-
-void
-ngx_gmtime(time_t t, ngx_tm_t *tp)
+//格林威治时间
+void ngx_gmtime(time_t t, ngx_tm_t *tp)
 {
     ngx_int_t   yday;
     ngx_uint_t  n, sec, min, hour, mday, mon, year, wday, days, leap;

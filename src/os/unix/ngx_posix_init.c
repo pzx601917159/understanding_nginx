@@ -29,7 +29,7 @@ ngx_os_io_t ngx_os_io = {
     0
 };
 
-
+//操作系统相关的初始化
 ngx_int_t
 ngx_os_init(ngx_log_t *log)
 {
@@ -40,11 +40,11 @@ ngx_os_init(ngx_log_t *log)
         return NGX_ERROR;
     }
 #endif
-
+    //修改进程名称
     if (ngx_init_setproctitle(log) != NGX_OK) {
         return NGX_ERROR;
     }
-
+    //回去内存页的大小
     ngx_pagesize = getpagesize();
     ngx_cacheline_size = NGX_CPU_CACHE_LINE;
 
@@ -52,6 +52,7 @@ ngx_os_init(ngx_log_t *log)
 
 #if (NGX_HAVE_SC_NPROCESSORS_ONLN)
     if (ngx_ncpu == 0) {
+        //获取cpu的个数
         ngx_ncpu = sysconf(_SC_NPROCESSORS_ONLN);
     }
 #endif
@@ -59,9 +60,9 @@ ngx_os_init(ngx_log_t *log)
     if (ngx_ncpu < 1) {
         ngx_ncpu = 1;
     }
-
+    //获取cpu信息
     ngx_cpuinfo();
-
+    //获取文件描述符限制
     if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
         ngx_log_error(NGX_LOG_ALERT, log, errno,
                       "getrlimit(RLIMIT_NOFILE) failed");
@@ -75,7 +76,7 @@ ngx_os_init(ngx_log_t *log)
 #else
     ngx_inherited_nonblocking = 0;
 #endif
-
+    //随机种子
     srandom(ngx_time());
 
     return NGX_OK;

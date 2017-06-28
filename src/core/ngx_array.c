@@ -9,11 +9,12 @@
 #include <ngx_core.h>
 
 
+//创建array，分配array结构体的内存，和array存储内容的内存
 ngx_array_t *
 ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size)
 {
     ngx_array_t *a;
-
+    //为array结构体分配内存
     a = ngx_palloc(p, sizeof(ngx_array_t));
     if (a == NULL) {
         return NULL;
@@ -26,7 +27,7 @@ ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size)
     return a;
 }
 
-
+//销毁array
 void
 ngx_array_destroy(ngx_array_t *a)
 {
@@ -43,7 +44,7 @@ ngx_array_destroy(ngx_array_t *a)
     }
 }
 
-
+//添加元素
 void *
 ngx_array_push(ngx_array_t *a)
 {
@@ -54,7 +55,7 @@ ngx_array_push(ngx_array_t *a)
     if (a->nelts == a->nalloc) {
 
         /* the array is full */
-
+        //数组存储的元素的总大小
         size = a->size * a->nalloc;
 
         p = a->pool;
@@ -72,6 +73,7 @@ ngx_array_push(ngx_array_t *a)
 
         } else {
             /* allocate a new array */
+            //需要以2倍的方式增加数组的容量
 
             new = ngx_palloc(p, 2 * size);
             if (new == NULL) {
@@ -90,7 +92,7 @@ ngx_array_push(ngx_array_t *a)
     return elt;
 }
 
-
+//
 void *
 ngx_array_push_n(ngx_array_t *a, ngx_uint_t n)
 {

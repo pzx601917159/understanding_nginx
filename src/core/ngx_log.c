@@ -8,10 +8,10 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
-static char *ngx_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-static char *ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log);
-static void ngx_log_insert(ngx_log_t *log, ngx_log_t *new_log);
+//static函数，只在本文件使用
+static char *ngx_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);//错误日子
+static char *ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log);//设置日志等级
+static void ngx_log_insert(ngx_log_t *log, ngx_log_t *new_log);//插入log
 
 
 #if (NGX_DEBUG)
@@ -30,7 +30,7 @@ typedef struct {
 
 #endif
 
-
+//错误命令数组
 static ngx_command_t  ngx_errlog_commands[] = {
 
     { ngx_string("error_log"),
@@ -50,7 +50,7 @@ static ngx_core_module_t  ngx_errlog_module_ctx = {
     NULL
 };
 
-
+//errlog模块
 ngx_module_t  ngx_errlog_module = {
     NGX_MODULE_V1,
     &ngx_errlog_module_ctx,                /* module context */
@@ -314,13 +314,14 @@ ngx_log_errno(u_char *buf, u_char *last, ngx_err_t err)
 }
 
 
-ngx_log_t *
-ngx_log_init(u_char *prefix)
+ngx_log_t * ngx_log_init(u_char *prefix)
 {
     u_char  *p, *name;
     size_t   nlen, plen;
 
+    //文件
     ngx_log.file = &ngx_log_file;
+    //日志等级
     ngx_log.log_level = NGX_LOG_NOTICE;
 
     name = (u_char *) NGX_ERROR_LOG_PATH;
@@ -358,6 +359,7 @@ ngx_log_init(u_char *prefix)
         }
 
         if (plen) {
+            //绝对路径
             name = malloc(plen + nlen + 2);
             if (name == NULL) {
                 return NULL;
@@ -375,6 +377,7 @@ ngx_log_init(u_char *prefix)
         }
     }
 
+    //追加方式打开文件
     ngx_log_file.fd = ngx_open_file(name, NGX_FILE_APPEND,
                                     NGX_FILE_CREATE_OR_OPEN,
                                     NGX_FILE_DEFAULT_ACCESS);
@@ -392,6 +395,7 @@ ngx_log_init(u_char *prefix)
         ngx_log_file.fd = ngx_stderr;
     }
 
+    //释放内存
     if (p) {
         ngx_free(p);
     }

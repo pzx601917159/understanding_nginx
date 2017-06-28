@@ -182,27 +182,37 @@ static char        *ngx_signal;
 
 static char **ngx_os_environ;
 
-
-int ngx_cdecl
-main(int argc, char *const *argv)
+//nginx的入口函数
+int ngx_cdecl main(int argc, char *const *argv)
 {
+    //buf结构
     ngx_buf_t        *b;
+    //日志
     ngx_log_t        *log;
+    //就是long uint类型
     ngx_uint_t        i;
+    //全局的cyccle
     ngx_cycle_t      *cycle, init_cycle;
+
+    //配置文件
     ngx_conf_dump_t  *cd;
+    //核心配置文件
     ngx_core_conf_t  *ccf;
 
+    //设置环境变量
     ngx_debug_init();
 
+    //加载系统的错误信息字符串到内存中
     if (ngx_strerror_init() != NGX_OK) {
         return 1;
     }
 
+    //解析命令行参数
     if (ngx_get_options(argc, argv) != NGX_OK) {
         return 1;
     }
 
+    //显示版本号
     if (ngx_show_version) {
         ngx_show_version_info();
 
@@ -213,14 +223,18 @@ main(int argc, char *const *argv)
 
     /* TODO */ ngx_max_sockets = -1;
 
+    //初始化时间
     ngx_time_init();
 
 #if (NGX_PCRE)
+    //正则表达式初始化，初始化正则表达式的malloc，free函数
     ngx_regex_init();
 #endif
-
+    
+    //获取pid
     ngx_pid = ngx_getpid();
 
+    //日志初始化，打开日志文件,ngx_prefix代表目录
     log = ngx_log_init(ngx_prefix);
     if (log == NULL) {
         return 1;
@@ -228,6 +242,7 @@ main(int argc, char *const *argv)
 
     /* STUB */
 #if (NGX_OPENSSL)
+    //openssl的初始化
     ngx_ssl_init(log);
 #endif
 
@@ -236,23 +251,26 @@ main(int argc, char *const *argv)
      * ngx_process_options()
      */
 
+    //init_cycle初始化
     ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));
     init_cycle.log = log;
     ngx_cycle = &init_cycle;
-
+    
+    //创建1k的内存池
     init_cycle.pool = ngx_create_pool(1024, log);
     if (init_cycle.pool == NULL) {
         return 1;
     }
 
+    //保存命令行参数
     if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
         return 1;
     }
-
+    //处理命令行选项
     if (ngx_process_options(&init_cycle) != NGX_OK) {
         return 1;
     }
-
+    //操作系统相关的一些初始化
     if (ngx_os_init(log) != NGX_OK) {
         return 1;
     }
@@ -260,19 +278,19 @@ main(int argc, char *const *argv)
     /*
      * ngx_crc32_table_init() requires ngx_cacheline_size set in ngx_os_init()
      */
-
+    //crc32表的初始化，加快算法速度
     if (ngx_crc32_table_init() != NGX_OK) {
         return 1;
     }
-
+    //这里没有完全看懂，是用来做平滑升级的
     if (ngx_add_inherited_sockets(&init_cycle) != NGX_OK) {
         return 1;
     }
-
+    //预先初始化一些module
     if (ngx_preinit_modules() != NGX_OK) {
         return 1;
     }
-
+    //初始化cycle
     cycle = ngx_init_cycle(&init_cycle);
     if (cycle == NULL) {
         if (ngx_test_config) {
@@ -371,8 +389,8 @@ main(int argc, char *const *argv)
 }
 
 
-static void
-ngx_show_version_info(void)
+//显示版本号
+static void ngx_show_version_info(void)
 {
     ngx_write_stderr("nginx version: " NGINX_VER_BUILD NGX_LINEFEED);
 
@@ -449,6 +467,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0,
                   "using inherited sockets from \"%s\"", inherited);
 
+    //初始化一个array
     if (ngx_array_init(&cycle->listening, cycle->pool, 10,
                        sizeof(ngx_listening_t))
         != NGX_OK)
@@ -476,6 +495,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
 
             ngx_memzero(ls, sizeof(ngx_listening_t));
 
+            //文件描述符
             ls->fd = (ngx_socket_t) s;
         }
     }
@@ -691,9 +711,8 @@ ngx_exec_new_binary(ngx_cycle_t *cycle, char *const *argv)
     return pid;
 }
 
-
-static ngx_int_t
-ngx_get_options(int argc, char *const *argv)
+//解析命令行参数
+static ngx_int_t ngx_get_options(int argc, char *const *argv)
 {
     u_char     *p;
     ngx_int_t   i;
@@ -711,12 +730,14 @@ ngx_get_options(int argc, char *const *argv)
 
             switch (*p++) {
 
+            //显示版本号和帮助信息
             case '?':
             case 'h':
                 ngx_show_version = 1;
                 ngx_show_help = 1;
                 break;
 
+            //显示版本好
             case 'v':
                 ngx_show_version = 1;
                 break;
@@ -726,6 +747,7 @@ ngx_get_options(int argc, char *const *argv)
                 ngx_show_configure = 1;
                 break;
 
+            //测试
             case 't':
                 ngx_test_config = 1;
                 break;
@@ -734,11 +756,13 @@ ngx_get_options(int argc, char *const *argv)
                 ngx_test_config = 1;
                 ngx_dump_config = 1;
                 break;
-
+            
+            //安静模式
             case 'q':
                 ngx_quiet_mode = 1;
                 break;
 
+            //ngx_prefix,nginx配置文件的目录前缀
             case 'p':
                 if (*p) {
                     ngx_prefix = p;
@@ -753,6 +777,7 @@ ngx_get_options(int argc, char *const *argv)
                 ngx_log_stderr(0, "option \"-p\" requires directory name");
                 return NGX_ERROR;
 
+            //配置文件
             case 'c':
                 if (*p) {
                     ngx_conf_file = p;
@@ -767,6 +792,7 @@ ngx_get_options(int argc, char *const *argv)
                 ngx_log_stderr(0, "option \"-c\" requires file name");
                 return NGX_ERROR;
 
+            //ngx_conf_params,指定一些全局配置，例如-g "pid /var/nginx.pid"
             case 'g':
                 if (*p) {
                     ngx_conf_params = p;
@@ -781,6 +807,7 @@ ngx_get_options(int argc, char *const *argv)
                 ngx_log_stderr(0, "option \"-g\" requires parameter");
                 return NGX_ERROR;
 
+            //-s表示单进程模式
             case 's':
                 if (*p) {
                     ngx_signal = (char *) p;
@@ -819,9 +846,8 @@ ngx_get_options(int argc, char *const *argv)
     return NGX_OK;
 }
 
-
-static ngx_int_t
-ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
+//保存命令行参数
+static ngx_int_t ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
 {
 #if (NGX_FREEBSD)
 
@@ -848,7 +874,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
         if (ngx_argv[i] == NULL) {
             return NGX_ERROR;
         }
-
+        //保存到ngx_argv中
         (void) ngx_cpystrn((u_char *) ngx_argv[i], (u_char *) argv[i], len);
     }
 
@@ -861,17 +887,17 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
     return NGX_OK;
 }
 
-
+//处理命令行选项
 static ngx_int_t
 ngx_process_options(ngx_cycle_t *cycle)
 {
     u_char  *p;
     size_t   len;
-
+    //目录前缀
     if (ngx_prefix) {
         len = ngx_strlen(ngx_prefix);
         p = ngx_prefix;
-
+        //判断最后一个字符是否有反斜杠，如果没有则添加
         if (len && !ngx_path_separator(p[len - 1])) {
             p = ngx_pnalloc(cycle->pool, len + 1);
             if (p == NULL) {
@@ -881,13 +907,13 @@ ngx_process_options(ngx_cycle_t *cycle)
             ngx_memcpy(p, ngx_prefix, len);
             p[len++] = '/';
         }
-
+        //cycle相关信息初始化
         cycle->conf_prefix.len = len;
         cycle->conf_prefix.data = p;
         cycle->prefix.len = len;
         cycle->prefix.data = p;
 
-    } else {
+    } else {//没有传输目录则为当前目录
 
 #ifndef NGX_PREFIX
 
@@ -921,7 +947,7 @@ ngx_process_options(ngx_cycle_t *cycle)
 
 #endif
     }
-
+    //配置文件，若没有则为默认的配置文件
     if (ngx_conf_file) {
         cycle->conf_file.len = ngx_strlen(ngx_conf_file);
         cycle->conf_file.data = ngx_conf_file;
@@ -929,11 +955,11 @@ ngx_process_options(ngx_cycle_t *cycle)
     } else {
         ngx_str_set(&cycle->conf_file, NGX_CONF_PATH);
     }
-
+    //得到绝对路径
     if (ngx_conf_full_name(cycle, &cycle->conf_file, 0) != NGX_OK) {
         return NGX_ERROR;
     }
-
+    //对ngx_prefix重新赋值
     for (p = cycle->conf_file.data + cycle->conf_file.len - 1;
          p > cycle->conf_file.data;
          p--)
@@ -944,12 +970,12 @@ ngx_process_options(ngx_cycle_t *cycle)
             break;
         }
     }
-
+    //全局配置
     if (ngx_conf_params) {
         cycle->conf_param.len = ngx_strlen(ngx_conf_params);
         cycle->conf_param.data = ngx_conf_params;
     }
-
+    //如果test_config存在，则日志等级为info
     if (ngx_test_config) {
         cycle->log->log_level = NGX_LOG_INFO;
     }

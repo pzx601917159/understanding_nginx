@@ -52,9 +52,9 @@ ngx_timezone_update(void)
 #endif
 }
 
-
-void
-ngx_localtime(time_t s, ngx_tm_t *tm)
+//transform date and time to broken-down time or ASCII
+//转换时间为字符串
+void ngx_localtime(time_t s, ngx_tm_t *tm)
 {
 #if (NGX_HAVE_LOCALTIME_R)
     (void) localtime_r(&s, tm);
@@ -67,7 +67,9 @@ ngx_localtime(time_t s, ngx_tm_t *tm)
 
 #endif
 
+    //月需要+1
     tm->ngx_tm_mon++;
+    //年需要+1900
     tm->ngx_tm_year += 1900;
 }
 

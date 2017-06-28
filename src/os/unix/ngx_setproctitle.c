@@ -30,7 +30,7 @@
 extern char **environ;
 
 static char *ngx_os_argv_last;
-
+//修改进程名称
 ngx_int_t
 ngx_init_setproctitle(ngx_log_t *log)
 {
@@ -43,7 +43,7 @@ ngx_init_setproctitle(ngx_log_t *log)
     for (i = 0; environ[i]; i++) {
         size += ngx_strlen(environ[i]) + 1;
     }
-
+    //直接调用的malloc
     p = ngx_alloc(size, log);
     if (p == NULL) {
         return NGX_ERROR;

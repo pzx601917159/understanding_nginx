@@ -42,8 +42,7 @@ ngx_strerror(ngx_err_t err, u_char *errstr, size_t size)
 }
 
 
-ngx_int_t
-ngx_strerror_init(void)
+ngx_int_t ngx_strerror_init(void)
 {
     char       *msg;
     u_char     *p;
@@ -54,6 +53,7 @@ ngx_strerror_init(void)
      * ngx_strerror() is not ready to work at this stage, therefore,
      * malloc() is used and possible errors are logged using strerror().
      */
+    //ngx_strerror当前还不可用，因此，使用malloc产生的错误信息通过strerror输出
 
     len = NGX_SYS_NERR * sizeof(ngx_str_t);
 
@@ -72,6 +72,8 @@ ngx_strerror_init(void)
         }
 
         ngx_memcpy(p, msg, len);
+        //把所有的错误信息存储在内存中的ngx_sys_errlist中,
+        //这样可以加快错误输出的速度,直接在内存中读取
         ngx_sys_errlist[err].len = len;
         ngx_sys_errlist[err].data = p;
     }

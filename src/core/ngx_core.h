@@ -4,7 +4,7 @@
  * Copyright (C) Nginx, Inc.
  */
 
-
+//nginx的公用头文件
 #ifndef _NGX_CORE_H_INCLUDED_
 #define _NGX_CORE_H_INCLUDED_
 
@@ -12,18 +12,18 @@
 #include <ngx_config.h>
 
 
-typedef struct ngx_module_s      ngx_module_t;
-typedef struct ngx_conf_s        ngx_conf_t;
-typedef struct ngx_cycle_s       ngx_cycle_t;
-typedef struct ngx_pool_s        ngx_pool_t;
-typedef struct ngx_chain_s       ngx_chain_t;
-typedef struct ngx_log_s         ngx_log_t;
-typedef struct ngx_open_file_s   ngx_open_file_t;
-typedef struct ngx_command_s     ngx_command_t;
-typedef struct ngx_file_s        ngx_file_t;
-typedef struct ngx_event_s       ngx_event_t;
-typedef struct ngx_event_aio_s   ngx_event_aio_t;
-typedef struct ngx_connection_s  ngx_connection_t;
+typedef struct ngx_module_s      ngx_module_t;      //ngx_module结构体
+typedef struct ngx_conf_s        ngx_conf_t;        //配置文件结构体
+typedef struct ngx_cycle_s       ngx_cycle_t;       //全局结构体
+typedef struct ngx_pool_s        ngx_pool_t;        //内存池结构体
+typedef struct ngx_chain_s       ngx_chain_t;   
+typedef struct ngx_log_s         ngx_log_t;         //日志结构体
+typedef struct ngx_open_file_s   ngx_open_file_t;   //打开文件的结构体
+typedef struct ngx_command_s     ngx_command_t;     //命令结构体
+typedef struct ngx_file_s        ngx_file_t;        //文件结构体
+typedef struct ngx_event_s       ngx_event_t;       //时间结构体
+typedef struct ngx_event_aio_s   ngx_event_aio_t;   //异步io结构体
+typedef struct ngx_connection_s  ngx_connection_t;  //连接对应的结构体
 
 #if (NGX_THREADS)
 typedef struct ngx_thread_task_s  ngx_thread_task_t;

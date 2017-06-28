@@ -68,9 +68,8 @@ ngx_module_t  ngx_regex_module = {
 static ngx_pool_t  *ngx_pcre_pool;
 static ngx_list_t  *ngx_pcre_studies;
 
-
-void
-ngx_regex_init(void)
+//malloc free函数初始化
+void ngx_regex_init(void)
 {
     pcre_malloc = ngx_regex_malloc;
     pcre_free = ngx_regex_free;
@@ -227,8 +226,7 @@ ngx_regex_exec_array(ngx_array_t *a, ngx_str_t *s, ngx_log_t *log)
 }
 
 
-static void * ngx_libc_cdecl
-ngx_regex_malloc(size_t size)
+static void * ngx_libc_cdecl ngx_regex_malloc(size_t size)
 {
     ngx_pool_t      *pool;
     pool = ngx_pcre_pool;
@@ -241,8 +239,7 @@ ngx_regex_malloc(size_t size)
 }
 
 
-static void ngx_libc_cdecl
-ngx_regex_free(void *p)
+static void ngx_libc_cdecl ngx_regex_free(void *p)
 {
     return;
 }

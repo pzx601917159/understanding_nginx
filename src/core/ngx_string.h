@@ -8,17 +8,17 @@
 #ifndef _NGX_STRING_H_INCLUDED_
 #define _NGX_STRING_H_INCLUDED_
 
-
+//ngx_string 相当与c++的std::string
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//结构体定义
 typedef struct {
     size_t      len;
     u_char     *data;
 } ngx_str_t;
 
-
+//key value结构体
 typedef struct {
     ngx_str_t   key;
     ngx_str_t   value;

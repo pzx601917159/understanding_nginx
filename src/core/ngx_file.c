@@ -44,7 +44,7 @@ ngx_get_full_name(ngx_pool_t *pool, ngx_str_t *prefix, ngx_str_t *name)
     if (n == NULL) {
         return NGX_ERROR;
     }
-
+    //返回dst拷贝结束的位置
     p = ngx_cpymem(n, prefix->data, len);
     ngx_cpystrn(p, name->data, name->len + 1);
 

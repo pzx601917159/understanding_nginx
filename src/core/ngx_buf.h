@@ -15,16 +15,18 @@
 
 typedef void *            ngx_buf_tag_t;
 
+//ngx_buf_s struct
 typedef struct ngx_buf_s  ngx_buf_t;
-
-struct ngx_buf_s {
+//ngx_buf结构体
+struct ngx_buf_s 
+{
     u_char          *pos;
     u_char          *last;
     off_t            file_pos;
     off_t            file_last;
 
-    u_char          *start;         /* start of buffer */
-    u_char          *end;           /* end of buffer */
+    u_char          *start;         /* start of buffer *///buf的起始位置
+    u_char          *end;           /* end of buffer *///buf的结束位置
     ngx_buf_tag_t    tag;
     ngx_file_t      *file;
     ngx_buf_t       *shadow;
@@ -37,9 +39,11 @@ struct ngx_buf_s {
      * the buf's content is in a memory cache or in a read only memory
      * and must not be changed
      */
+    //buf的内容在内存缓存中或者时只读的内存，不可改变
     unsigned         memory:1;
 
     /* the buf's content is mmap()ed and must not be changed */
+    //mmap分配的内存，而且不可改变
     unsigned         mmap:1;
 
     unsigned         recycled:1;
@@ -56,7 +60,7 @@ struct ngx_buf_s {
 };
 
 
-struct ngx_chain_s {
+struct ngx_chain_s {    //实际上就是一个ngx_buf_t结构体组成的链表
     ngx_buf_t    *buf;
     ngx_chain_t  *next;
 };

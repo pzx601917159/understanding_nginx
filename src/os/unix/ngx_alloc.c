@@ -13,7 +13,7 @@ ngx_uint_t  ngx_pagesize;
 ngx_uint_t  ngx_pagesize_shift;
 ngx_uint_t  ngx_cacheline_size;
 
-
+//直接调用malloc，没用到内存池
 void *
 ngx_alloc(size_t size, ngx_log_t *log)
 {
@@ -48,12 +48,12 @@ ngx_calloc(size_t size, ngx_log_t *log)
 
 #if (NGX_HAVE_POSIX_MEMALIGN)
 
-void *
-ngx_memalign(size_t alignment, size_t size, ngx_log_t *log)
+//分配内存
+void *ngx_memalign(size_t alignment, size_t size, ngx_log_t *log)
 {
     void  *p;
     int    err;
-
+    //调用posix的接口分配内存，并按alignment变量进行内存对齐
     err = posix_memalign(&p, alignment, size);
 
     if (err) {

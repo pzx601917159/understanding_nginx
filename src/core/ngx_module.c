@@ -21,12 +21,12 @@ static ngx_uint_t ngx_module_ctx_index(ngx_cycle_t *cycle, ngx_uint_t type,
 ngx_uint_t         ngx_max_module;
 static ngx_uint_t  ngx_modules_n;
 
-
+//预先初始化一些module
 ngx_int_t
 ngx_preinit_modules(void)
 {
     ngx_uint_t  i;
-
+    //初始化index和name属性
     for (i = 0; ngx_modules[i]; i++) {
         ngx_modules[i]->index = i;
         ngx_modules[i]->name = ngx_module_names[i];
@@ -46,13 +46,13 @@ ngx_cycle_modules(ngx_cycle_t *cycle)
      * create a list of modules to be used for this cycle,
      * copy static modules to it
      */
-
+    //给这个cycle创建一个模块链表
     cycle->modules = ngx_pcalloc(cycle->pool, (ngx_max_module + 1)
                                               * sizeof(ngx_module_t *));
     if (cycle->modules == NULL) {
         return NGX_ERROR;
     }
-
+    //拷贝ngx_modules的内容
     ngx_memcpy(cycle->modules, ngx_modules,
                ngx_modules_n * sizeof(ngx_module_t *));
 
