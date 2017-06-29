@@ -9,7 +9,7 @@
 #include <ngx_core.h>
 #include <nginx.h>
 
-
+//显示版本信息
 static void ngx_show_version_info(void);
 static ngx_int_t ngx_add_inherited_sockets(ngx_cycle_t *cycle);
 static ngx_int_t ngx_get_options(int argc, char *const *argv);

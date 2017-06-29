@@ -12,10 +12,10 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//nginx对文件的封装
 struct ngx_file_s {
-    ngx_fd_t                   fd;
-    ngx_str_t                  name;
+    ngx_fd_t                   fd;//文件描述符
+    ngx_str_t                  name;//文件名
     ngx_file_info_t            info;
 
     off_t                      offset;

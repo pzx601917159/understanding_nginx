@@ -22,7 +22,7 @@
  * takes half as much CPU clocks than ngx_crc32_long().
  */
 
-
+//初始化table
 static uint32_t  ngx_crc32_table16[] = {
     0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
     0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
@@ -101,7 +101,7 @@ uint32_t  ngx_crc32_table256[] = {
 
 uint32_t *ngx_crc32_table_short = ngx_crc32_table16;
 
-
+//table初始化
 ngx_int_t
 ngx_crc32_table_init(void)
 {

@@ -23,10 +23,13 @@ typedef struct
     ngx_pool_t  *pool;  //内存池
 } ngx_array_t;
 
-
+//创建array
 ngx_array_t *ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size);
+//销毁array
 void ngx_array_destroy(ngx_array_t *a);
+//获取array元素内存，返回的是新元素的指针
 void *ngx_array_push(ngx_array_t *a);
+//获取n个array元素内存，返回的是新元素的指针
 void *ngx_array_push_n(ngx_array_t *a, ngx_uint_t n);
 
 //ngx_array初始化,分配内存

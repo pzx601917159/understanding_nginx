@@ -12,9 +12,9 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//crc32算法
 extern uint32_t  *ngx_crc32_table_short;
-extern uint32_t   ngx_crc32_table256[];
+extern uint32_t   ngx_crc32_table256[];//table用于加快算法速度
 
 
 static ngx_inline uint32_t

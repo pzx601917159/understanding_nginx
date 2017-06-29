@@ -20,8 +20,8 @@ typedef struct {
 
 //key value结构体
 typedef struct {
-    ngx_str_t   key;
-    ngx_str_t   value;
+    ngx_str_t   key;//key
+    ngx_str_t   value;//value
 } ngx_keyval_t;
 
 
@@ -36,32 +36,37 @@ typedef struct {
     u_char     *data;
 } ngx_variable_value_t;
 
-
+//生成ngx_string
 #define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }
+//空ngx_string
 #define ngx_null_string     { 0, NULL }
+//设置str为text的内容
 #define ngx_str_set(str, text)                                               \
     (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text
+//把str置空
 #define ngx_str_null(str)   (str)->len = 0; (str)->data = NULL
 
-
+//转换成小写
 #define ngx_tolower(c)      (u_char) ((c >= 'A' && c <= 'Z') ? (c | 0x20) : c)
+//转换成大写
 #define ngx_toupper(c)      (u_char) ((c >= 'a' && c <= 'z') ? (c & ~0x20) : c)
 
 void ngx_strlow(u_char *dst, u_char *src, size_t n);
 
-
+//比较
 #define ngx_strncmp(s1, s2, n)  strncmp((const char *) s1, (const char *) s2, n)
 
 
 /* msvc and icc7 compile strcmp() to inline loop */
 #define ngx_strcmp(s1, s2)  strcmp((const char *) s1, (const char *) s2)
 
-
+//从s1中查找s2
 #define ngx_strstr(s1, s2)  strstr((const char *) s1, (const char *) s2)
+//strlen
 #define ngx_strlen(s)       strlen((const char *) s)
-
+//从s1中查找c
 #define ngx_strchr(s1, c)   strchr((const char *) s1, (int) c)
-
+//从p指向的字符串中查找c
 static ngx_inline u_char *
 ngx_strlchr(u_char *p, u_char *last, u_char c)
 {
@@ -83,12 +88,13 @@ ngx_strlchr(u_char *p, u_char *last, u_char c)
  * while ZeroMemory() and bzero() are the calls.
  * icc7 may also inline several mov's of a zeroed register for small blocks.
  */
+//memset
 #define ngx_memzero(buf, n)       (void) memset(buf, 0, n)
 #define ngx_memset(buf, c, n)     (void) memset(buf, c, n)
 
 
 #if (NGX_MEMCPY_LIMIT)
-
+//内存拷贝
 void *ngx_memcpy(void *dst, const void *src, size_t n);
 #define ngx_cpymem(dst, src, n)   (((u_char *) ngx_memcpy(dst, src, n)) + (n))
 
@@ -99,7 +105,9 @@ void *ngx_memcpy(void *dst, const void *src, size_t n);
  * gcc3 compiles memcpy(d, s, 4) to the inline "mov"es.
  * icc8 compile memcpy(d, s, 4) to the inline "mov"es or XMM moves.
  */
+//memcpy无返回
 #define ngx_memcpy(dst, src, n)   (void) memcpy(dst, src, n)
+//拷贝完成返回dst的结束位置
 #define ngx_cpymem(dst, src, n)   (((u_char *) memcpy(dst, src, n)) + (n))
 
 #endif
@@ -111,10 +119,10 @@ void *ngx_memcpy(void *dst, const void *src, size_t n);
  * the simple inline cycle copies the variable length strings up to 16
  * bytes faster than icc8 autodetecting _intel_fast_memcpy()
  */
-
+//返回的时拷贝结束的位置
 static ngx_inline u_char *
 ngx_copy(u_char *dst, u_char *src, size_t len)
-{
+{   //满满的都是细节
     if (len < 17) {
 
         while (len) {
@@ -137,15 +145,19 @@ ngx_copy(u_char *dst, u_char *src, size_t len)
 
 
 #define ngx_memmove(dst, src, n)   (void) memmove(dst, src, n)
+//返回dst拷贝结束的位置
 #define ngx_movemem(dst, src, n)   (((u_char *) memmove(dst, src, n)) + (n))
 
 
 /* msvc and icc7 compile memcmp() to the inline loop */
+//内存比较
 #define ngx_memcmp(s1, s2, n)  memcmp((const char *) s1, (const char *) s2, n)
 
-
+//拷贝字符串
 u_char *ngx_cpystrn(u_char *dst, u_char *src, size_t n);
+//分配内存，复制str
 u_char *ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src);
+//字符串格式化
 u_char * ngx_cdecl ngx_sprintf(u_char *buf, const char *fmt, ...);
 u_char * ngx_cdecl ngx_snprintf(u_char *buf, size_t max, const char *fmt, ...);
 u_char * ngx_cdecl ngx_slprintf(u_char *buf, u_char *last, const char *fmt,
@@ -153,10 +165,10 @@ u_char * ngx_cdecl ngx_slprintf(u_char *buf, u_char *last, const char *fmt,
 u_char *ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args);
 #define ngx_vsnprintf(buf, max, fmt, args)                                   \
     ngx_vslprintf(buf, buf + (max), fmt, args)
-
+//字符串比较
 ngx_int_t ngx_strcasecmp(u_char *s1, u_char *s2);
 ngx_int_t ngx_strncasecmp(u_char *s1, u_char *s2, size_t n);
-
+//字符串查找
 u_char *ngx_strnstr(u_char *s1, char *s2, size_t n);
 
 u_char *ngx_strstrn(u_char *s1, char *s2, size_t n);
@@ -166,6 +178,7 @@ u_char *ngx_strlcasestrn(u_char *s1, u_char *last, u_char *s2, size_t n);
 ngx_int_t ngx_rstrncmp(u_char *s1, u_char *s2, size_t n);
 ngx_int_t ngx_rstrncasecmp(u_char *s1, u_char *s2, size_t n);
 ngx_int_t ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2);
+//dns比较
 ngx_int_t ngx_dns_strcmp(u_char *s1, u_char *s2);
 ngx_int_t ngx_filename_cmp(u_char *s1, u_char *s2, size_t n);
 
@@ -178,10 +191,10 @@ ngx_int_t ngx_hextoi(u_char *line, size_t n);
 
 u_char *ngx_hex_dump(u_char *dst, u_char *src, size_t len);
 
-
+//计算base64编解码之后的长度
 #define ngx_base64_encoded_length(len)  (((len + 2) / 3) * 4)
 #define ngx_base64_decoded_length(len)  (((len + 3) / 4) * 3)
-
+//base64编解码
 void ngx_encode_base64(ngx_str_t *dst, ngx_str_t *src);
 void ngx_encode_base64url(ngx_str_t *dst, ngx_str_t *src);
 ngx_int_t ngx_decode_base64(ngx_str_t *dst, ngx_str_t *src);
@@ -209,19 +222,19 @@ void ngx_unescape_uri(u_char **dst, u_char **src, size_t size, ngx_uint_t type);
 uintptr_t ngx_escape_html(u_char *dst, u_char *src, size_t size);
 uintptr_t ngx_escape_json(u_char *dst, u_char *src, size_t size);
 
-
+//红黑树str节点
 typedef struct {
     ngx_rbtree_node_t         node;
     ngx_str_t                 str;
 } ngx_str_node_t;
 
-
+//插入
 void ngx_str_rbtree_insert_value(ngx_rbtree_node_t *temp,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel);
 ngx_str_node_t *ngx_str_rbtree_lookup(ngx_rbtree_t *rbtree, ngx_str_t *name,
     uint32_t hash);
 
-
+//排序
 void ngx_sort(void *base, size_t n, size_t size,
     ngx_int_t (*cmp)(const void *, const void *));
 #define ngx_qsort             qsort

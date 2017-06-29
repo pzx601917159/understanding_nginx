@@ -14,7 +14,7 @@
 
 
 /* 32-bit crc16 */
-
+//crc算法根据字符串生成数字
 static ngx_inline uint32_t
 ngx_crc(u_char *data, size_t len)
 {
