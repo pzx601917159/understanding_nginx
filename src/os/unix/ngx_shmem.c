@@ -10,10 +10,11 @@
 
 
 #if (NGX_HAVE_MAP_ANON)
-
+//分配共享内存
 ngx_int_t
 ngx_shm_alloc(ngx_shm_t *shm)
 {
+    //调用mmap
     shm->addr = (u_char *) mmap(NULL, shm->size,
                                 PROT_READ|PROT_WRITE,
                                 MAP_ANON|MAP_SHARED, -1, 0);
@@ -31,6 +32,7 @@ ngx_shm_alloc(ngx_shm_t *shm)
 void
 ngx_shm_free(ngx_shm_t *shm)
 {
+    //释放内存
     if (munmap((void *) shm->addr, shm->size) == -1) {
         ngx_log_error(NGX_LOG_ALERT, shm->log, ngx_errno,
                       "munmap(%p, %uz) failed", shm->addr, shm->size);

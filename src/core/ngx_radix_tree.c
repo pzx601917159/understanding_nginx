@@ -8,7 +8,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//分配内存
 static ngx_radix_node_t *ngx_radix_alloc(ngx_radix_tree_t *tree);
 
 
@@ -459,24 +459,26 @@ ngx_radix128tree_find(ngx_radix_tree_t *tree, u_char *key)
 
 #endif
 
-
+//分配内存
 static ngx_radix_node_t *
 ngx_radix_alloc(ngx_radix_tree_t *tree)
 {
     ngx_radix_node_t  *p;
 
-    if (tree->free) {
+    if (tree->free) 
+    {
         p = tree->free;
         tree->free = tree->free->right;
         return p;
     }
 
-    if (tree->size < sizeof(ngx_radix_node_t)) {
+    if (tree->size < sizeof(ngx_radix_node_t)) 
+    {
         tree->start = ngx_pmemalign(tree->pool, ngx_pagesize, ngx_pagesize);
-        if (tree->start == NULL) {
+        if (tree->start == NULL) 
+        {
             return NULL;
         }
-
         tree->size = ngx_pagesize;
     }
 

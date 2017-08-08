@@ -71,12 +71,13 @@ typedef struct {
     size_t       size;
 } ngx_bufs_t;
 
-
+//输出链表
 typedef struct ngx_output_chain_ctx_s  ngx_output_chain_ctx_t;
-
+//过滤输出
 typedef ngx_int_t (*ngx_output_chain_filter_pt)(void *ctx, ngx_chain_t *in);
 
 #if (NGX_HAVE_FILE_AIO)
+//
 typedef void (*ngx_output_chain_aio_pt)(ngx_output_chain_ctx_t *ctx,
     ngx_file_t *file);
 #endif

@@ -12,50 +12,56 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
-typedef ngx_uint_t  ngx_rbtree_key_t;
-typedef ngx_int_t   ngx_rbtree_key_int_t;
+//ngx实现的红黑数
+typedef ngx_uint_t  ngx_rbtree_key_t;//key无符号整型
+typedef ngx_int_t   ngx_rbtree_key_int_t;//有福好整型key
 
 
 typedef struct ngx_rbtree_node_s  ngx_rbtree_node_t;
 
 struct ngx_rbtree_node_s {
-    ngx_rbtree_key_t       key;
-    ngx_rbtree_node_t     *left;
-    ngx_rbtree_node_t     *right;
-    ngx_rbtree_node_t     *parent;
-    u_char                 color;
-    u_char                 data;
+    ngx_rbtree_key_t       key;     //key
+    ngx_rbtree_node_t     *left;    //左子节点
+    ngx_rbtree_node_t     *right;   //右子节点
+    ngx_rbtree_node_t     *parent;  //父节点
+    u_char                 color;   //颜色
+    u_char                 data;    //数据
 };
 
 
 typedef struct ngx_rbtree_s  ngx_rbtree_t;
 
+//插入节点,哨兵节点为nil
 typedef void (*ngx_rbtree_insert_pt) (ngx_rbtree_node_t *root,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel);
 
-struct ngx_rbtree_s {
+//红黑树
+struct ngx_rbtree_s 
+{
     ngx_rbtree_node_t     *root;
     ngx_rbtree_node_t     *sentinel;
     ngx_rbtree_insert_pt   insert;
 };
 
 
-#define ngx_rbtree_init(tree, s, i)                                           \
-    ngx_rbtree_sentinel_init(s);                                              \
-    (tree)->root = s;                                                         \
-    (tree)->sentinel = s;                                                     \
+#define ngx_rbtree_init(tree, s, i) \
+    ngx_rbtree_sentinel_init(s);    \
+    (tree)->root = s;               \
+    (tree)->sentinel = s;           \
     (tree)->insert = i
 
-
+//插入
 void ngx_rbtree_insert(ngx_rbtree_t *tree, ngx_rbtree_node_t *node);
+//删除
 void ngx_rbtree_delete(ngx_rbtree_t *tree, ngx_rbtree_node_t *node);
+//插入值
 void ngx_rbtree_insert_value(ngx_rbtree_node_t *root, ngx_rbtree_node_t *node,
     ngx_rbtree_node_t *sentinel);
+//插入定时器?
 void ngx_rbtree_insert_timer_value(ngx_rbtree_node_t *root,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel);
 
-
+//节点颜色相关
 #define ngx_rbt_red(node)               ((node)->color = 1)
 #define ngx_rbt_black(node)             ((node)->color = 0)
 #define ngx_rbt_is_red(node)            ((node)->color)
@@ -64,10 +70,10 @@ void ngx_rbtree_insert_timer_value(ngx_rbtree_node_t *root,
 
 
 /* a sentinel must be black */
-
+//sentinel置为黑色
 #define ngx_rbtree_sentinel_init(node)  ngx_rbt_black(node)
 
-
+//获取最小的节点
 static ngx_inline ngx_rbtree_node_t *
 ngx_rbtree_min(ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel)
 {

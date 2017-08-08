@@ -24,14 +24,14 @@ struct ngx_file_s {
     ngx_log_t                 *log;
 
 #if (NGX_THREADS)
-    ngx_int_t                (*thread_handler)(ngx_thread_task_t *task,
-                                               ngx_file_t *file);
-    void                      *thread_ctx;
-    ngx_thread_task_t         *thread_task;
+    //多线程的情况下
+    ngx_int_t   (*thread_handler)(ngx_thread_task_t *task,ngx_file_t *file);//线程函数
+    void                      *thread_ctx;//线程上下文
+    ngx_thread_task_t         *thread_task;//线程任务
 #endif
 
 #if (NGX_HAVE_FILE_AIO)
-    ngx_event_aio_t           *aio;
+    ngx_event_aio_t           *aio;//异步io
 #endif
 
     unsigned                   valid_info:1;
@@ -45,10 +45,10 @@ struct ngx_file_s {
 typedef time_t (*ngx_path_manager_pt) (void *data);
 typedef void (*ngx_path_loader_pt) (void *data);
 
-
+//文件路径
 typedef struct {
-    ngx_str_t                  name;
-    size_t                     len;
+    ngx_str_t                  name;//路径名
+    size_t                     len;//长度
     size_t                     level[3];
 
     ngx_path_manager_pt        manager;
@@ -59,23 +59,23 @@ typedef struct {
     ngx_uint_t                 line;
 } ngx_path_t;
 
-
+//文件路径
 typedef struct {
     ngx_str_t                  name;
     size_t                     level[3];
 } ngx_path_init_t;
 
-
+//临时文件
 typedef struct {
-    ngx_file_t                 file;
+    ngx_file_t                 file;//文件
     off_t                      offset;
-    ngx_path_t                *path;
-    ngx_pool_t                *pool;
+    ngx_path_t                *path;//路径
+    ngx_pool_t                *pool;//内存池
     char                      *warn;
 
     ngx_uint_t                 access;
 
-    unsigned                   log_level:8;
+    unsigned                   log_level:8;//日志等级
     unsigned                   persistent:1;
     unsigned                   clean:1;
     unsigned                   thread_write:1;

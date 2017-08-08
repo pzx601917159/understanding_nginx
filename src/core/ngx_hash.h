@@ -11,18 +11,18 @@
 
 #include <ngx_config.h>
 #include <ngx_core.h>
-
-
+//ngx_hash的实现
+//单个hash元素
 typedef struct {
-    void             *value;
-    u_short           len;
+    void             *value;//存储值
+    u_short           len;  //存储值的长度
     u_char            name[1];
 } ngx_hash_elt_t;
 
 
 typedef struct {
-    ngx_hash_elt_t  **buckets;
-    ngx_uint_t        size;
+    ngx_hash_elt_t  **buckets;  //二级指针
+    ngx_uint_t        size;     //大小
 } ngx_hash_t;
 
 
@@ -31,14 +31,14 @@ typedef struct {
     void             *value;
 } ngx_hash_wildcard_t;
 
-
+//hash_key结构体
 typedef struct {
-    ngx_str_t         key;
-    ngx_uint_t        key_hash;
-    void             *value;
+    ngx_str_t         key;      //key的字符串
+    ngx_uint_t        key_hash; //key的hash值
+    void             *value;    
 } ngx_hash_key_t;
 
-
+//hash函数
 typedef ngx_uint_t (*ngx_hash_key_pt) (u_char *data, size_t len);
 
 
@@ -96,13 +96,13 @@ typedef struct {
     u_char           *lowcase_key;
 } ngx_table_elt_t;
 
-
+//hash查找
 void *ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len);
 void *ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len);
 void *ngx_hash_find_wc_tail(ngx_hash_wildcard_t *hwc, u_char *name, size_t len);
 void *ngx_hash_find_combined(ngx_hash_combined_t *hash, ngx_uint_t key,
     u_char *name, size_t len);
-
+//hash初始化
 ngx_int_t ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
     ngx_uint_t nelts);
 ngx_int_t ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,

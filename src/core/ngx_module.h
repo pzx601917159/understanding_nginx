@@ -244,31 +244,31 @@
 
 
 struct ngx_module_s {
-    ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
+    ngx_uint_t            ctx_index;//索引
+    ngx_uint_t            index;//索引
 
-    char                 *name;
+    char                 *name;//名字
 
     ngx_uint_t            spare0;
     ngx_uint_t            spare1;
 
-    ngx_uint_t            version;
+    ngx_uint_t            version;//版本
     const char           *signature;
 
     void                 *ctx;
-    ngx_command_t        *commands;
+    ngx_command_t        *commands;//命令
     ngx_uint_t            type;
 
-    ngx_int_t           (*init_master)(ngx_log_t *log);
+    ngx_int_t           (*init_master)(ngx_log_t *log);//初始化master函数指针
 
-    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);
+    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);//初始化module指针
 
-    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);
-    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);
-    void                (*exit_thread)(ngx_cycle_t *cycle);
-    void                (*exit_process)(ngx_cycle_t *cycle);
+    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);//初始化程序调用的函数
+    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);//初始化线程调用的函数指针
+    void                (*exit_thread)(ngx_cycle_t *cycle);//退出线程调用的函数指针
+    void                (*exit_process)(ngx_cycle_t *cycle);//退出进程调用的函数指针
 
-    void                (*exit_master)(ngx_cycle_t *cycle);
+    void                (*exit_master)(ngx_cycle_t *cycle);//master退出调用的函数指针
 
     uintptr_t             spare_hook0;
     uintptr_t             spare_hook1;
@@ -281,27 +281,28 @@ struct ngx_module_s {
 };
 
 
-typedef struct {
-    ngx_str_t             name;
-    void               *(*create_conf)(ngx_cycle_t *cycle);
-    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);
+typedef struct 
+{
+    ngx_str_t             name;//名字
+    void               *(*create_conf)(ngx_cycle_t *cycle);//创建配置
+    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);//初始化配置
 } ngx_core_module_t;
 
 
-ngx_int_t ngx_preinit_modules(void);
-ngx_int_t ngx_cycle_modules(ngx_cycle_t *cycle);
-ngx_int_t ngx_init_modules(ngx_cycle_t *cycle);
-ngx_int_t ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type);
+ngx_int_t ngx_preinit_modules(void);//预先初始化模块
+ngx_int_t ngx_cycle_modules(ngx_cycle_t *cycle);//拷贝module到cycle中
+ngx_int_t ngx_init_modules(ngx_cycle_t *cycle);//初始化模块
+ngx_int_t ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type);//计算模块的数量
 
-
+//添加module
 ngx_int_t ngx_add_module(ngx_conf_t *cf, ngx_str_t *file,
     ngx_module_t *module, char **order);
 
 
-extern ngx_module_t  *ngx_modules[];
-extern ngx_uint_t     ngx_max_module;
+extern ngx_module_t  *ngx_modules[];//所有的module
+extern ngx_uint_t     ngx_max_module;//模块数量的最大值
 
-extern char          *ngx_module_names[];
+extern char          *ngx_module_names[];//模块的名字
 
 
 #endif /* _NGX_MODULE_H_INCLUDED_ */

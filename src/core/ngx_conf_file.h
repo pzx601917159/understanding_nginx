@@ -75,9 +75,10 @@
 #define NGX_MAX_CONF_ERRSTR  1024
 
 
-struct ngx_command_s {
-    ngx_str_t             name;
-    ngx_uint_t            type;
+struct ngx_command_s 
+{
+    ngx_str_t             name;//命令名
+    ngx_uint_t            type;//类型
     char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
     ngx_uint_t            conf;
     ngx_uint_t            offset;
@@ -86,17 +87,19 @@ struct ngx_command_s {
 
 #define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }
 
+//打开的文件结构体
+struct ngx_open_file_s 
+{
+    ngx_fd_t              fd;//文件描述符
+    ngx_str_t             name;//名字
 
-struct ngx_open_file_s {
-    ngx_fd_t              fd;
-    ngx_str_t             name;
-
-    void                (*flush)(ngx_open_file_t *file, ngx_log_t *log);
-    void                 *data;
+    void                (*flush)(ngx_open_file_t *file, ngx_log_t *log);//flush函数指针
+    void                 *data;//数据
 };
 
 
-typedef struct {
+typedef struct 
+{
     ngx_file_t            file;
     ngx_buf_t            *buffer;
     ngx_buf_t            *dump;
@@ -104,7 +107,8 @@ typedef struct {
 } ngx_conf_file_t;
 
 
-typedef struct {
+typedef struct 
+{
     ngx_str_t             name;
     ngx_buf_t            *buffer;
 } ngx_conf_dump_t;
@@ -113,8 +117,9 @@ typedef struct {
 typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
     ngx_command_t *dummy, void *conf);
 
-
-struct ngx_conf_s {
+//配置文件结构体
+struct ngx_conf_s 
+{
     char                 *name;
     ngx_array_t          *args;
 

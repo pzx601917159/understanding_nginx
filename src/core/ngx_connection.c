@@ -12,7 +12,7 @@
 
 ngx_os_io_t  ngx_io;
 
-
+//内部函数
 static void ngx_drain_connections(void);
 
 
@@ -23,7 +23,7 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
     ngx_listening_t  *ls;
     struct sockaddr  *sa;
     u_char            text[NGX_SOCKADDR_STRLEN];
-
+    //获取一个array节点
     ls = ngx_array_push(&cf->cycle->listening);
     if (ls == NULL) {
         return NULL;

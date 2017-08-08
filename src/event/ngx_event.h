@@ -26,13 +26,13 @@ typedef struct {
 
 #endif
 
-
+//ngx事件
 struct ngx_event_s {
-    void            *data;
+    void            *data;//数据
 
-    unsigned         write:1;
+    unsigned         write:1;//写
 
-    unsigned         accept:1;
+    unsigned         accept:1;//接收
 
     /* used to detect the stale events in kqueue and epoll */
     unsigned         instance:1;
@@ -108,7 +108,7 @@ struct ngx_event_s {
     unsigned         available:1;
 #endif
 
-    ngx_event_handler_pt  handler;
+    ngx_event_handler_pt  handler;//时间处理函数
 
 
 #if (NGX_HAVE_IOCP)
@@ -117,9 +117,9 @@ struct ngx_event_s {
 
     ngx_uint_t       index;
 
-    ngx_log_t       *log;
+    ngx_log_t       *log;//日志
 
-    ngx_rbtree_node_t   timer;
+    ngx_rbtree_node_t   timer;//定时器
 
     /* the posted queue */
     ngx_queue_t      queue;

@@ -15,14 +15,14 @@
 
 
 struct ngx_thread_task_s {
-    ngx_thread_task_t   *next;
-    ngx_uint_t           id;
-    void                *ctx;
-    void               (*handler)(void *data, ngx_log_t *log);
-    ngx_event_t          event;
+    ngx_thread_task_t   *next;//下个节点
+    ngx_uint_t           id;//id
+    void                *ctx;//上下文
+    void               (*handler)(void *data, ngx_log_t *log);//函数指针
+    ngx_event_t          event;//事件
 };
 
-
+//线程池
 typedef struct ngx_thread_pool_s  ngx_thread_pool_t;
 
 

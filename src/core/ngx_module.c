@@ -13,12 +13,12 @@
 #define NGX_MAX_DYNAMIC_MODULES  128
 
 
-static ngx_uint_t ngx_module_index(ngx_cycle_t *cycle);
+static ngx_uint_t ngx_module_index(ngx_cycle_t *cycle);//获取index
 static ngx_uint_t ngx_module_ctx_index(ngx_cycle_t *cycle, ngx_uint_t type,
-    ngx_uint_t index);
+    ngx_uint_t index);//index
 
 
-ngx_uint_t         ngx_max_module;
+ngx_uint_t         ngx_max_module;//最大模块数量
 static ngx_uint_t  ngx_modules_n;
 
 //预先初始化一些module
@@ -27,7 +27,8 @@ ngx_preinit_modules(void)
 {
     ngx_uint_t  i;
     //初始化index和name属性
-    for (i = 0; ngx_modules[i]; i++) {
+    for (i = 0; ngx_modules[i]; i++) 
+    {
         ngx_modules[i]->index = i;
         ngx_modules[i]->name = ngx_module_names[i];
     }
@@ -38,7 +39,7 @@ ngx_preinit_modules(void)
     return NGX_OK;
 }
 
-
+//拷贝modules信息到cycle中
 ngx_int_t
 ngx_cycle_modules(ngx_cycle_t *cycle)
 {
@@ -61,15 +62,18 @@ ngx_cycle_modules(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+//初始化module,调用所有模块的init_module函数
 ngx_int_t
 ngx_init_modules(ngx_cycle_t *cycle)
 {
     ngx_uint_t  i;
 
-    for (i = 0; cycle->modules[i]; i++) {
-        if (cycle->modules[i]->init_module) {
-            if (cycle->modules[i]->init_module(cycle) != NGX_OK) {
+    for (i = 0; cycle->modules[i]; i++) 
+    {
+        if (cycle->modules[i]->init_module) 
+        {
+            if (cycle->modules[i]->init_module(cycle) != NGX_OK) 
+            {
                 return NGX_ERROR;
             }
         }
@@ -78,7 +82,7 @@ ngx_init_modules(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+//获取type对应的模块的数量
 ngx_int_t
 ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
 {
@@ -152,7 +156,7 @@ ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
     return max + 1;
 }
 
-
+//插入module
 ngx_int_t
 ngx_add_module(ngx_conf_t *cf, ngx_str_t *file, ngx_module_t *module,
     char **order)
@@ -160,13 +164,14 @@ ngx_add_module(ngx_conf_t *cf, ngx_str_t *file, ngx_module_t *module,
     void               *rv;
     ngx_uint_t          i, m, before;
     ngx_core_module_t  *core_module;
-
-    if (cf->cycle->modules_n >= ngx_max_module) {
+    //不能超过最大的数量
+    if (cf->cycle->modules_n >= ngx_max_module) 
+    {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                            "too many modules loaded");
         return NGX_ERROR;
     }
-
+    //版本必须一样
     if (module->version != nginx_version) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                            "module \"%V\" version %ui instead of %ui",
@@ -275,7 +280,7 @@ ngx_add_module(ngx_conf_t *cf, ngx_str_t *file, ngx_module_t *module,
     return NGX_OK;
 }
 
-
+//获取一个index
 static ngx_uint_t
 ngx_module_index(ngx_cycle_t *cycle)
 {
@@ -287,7 +292,7 @@ ngx_module_index(ngx_cycle_t *cycle)
 again:
 
     /* find an unused index */
-
+    //查找一个没使用的index
     for (i = 0; cycle->modules[i]; i++) {
         module = cycle->modules[i];
 
@@ -298,7 +303,7 @@ again:
     }
 
     /* check previous cycle */
-
+    //查找old_cycle
     if (cycle->old_cycle && cycle->old_cycle->modules) {
 
         for (i = 0; cycle->old_cycle->modules[i]; i++) {
