@@ -15,9 +15,9 @@
 
 #define NGX_OPEN_FILE_DIRECTIO_OFF  NGX_MAX_OFF_T_VALUE
 
-
+//打开文件的信息
 typedef struct {
-    ngx_fd_t                 fd;
+    ngx_fd_t                 fd;//描述符
     ngx_file_uniq_t          uniq;
     time_t                   mtime;
     off_t                    size;

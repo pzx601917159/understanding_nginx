@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//hash算法，产生一个uint32
 uint32_t ngx_murmur_hash2(u_char *data, size_t len);
 
 

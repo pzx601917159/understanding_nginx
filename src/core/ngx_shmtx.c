@@ -11,10 +11,10 @@
 
 #if (NGX_HAVE_ATOMIC_OPS)
 
-
+//唤醒
 static void ngx_shmtx_wakeup(ngx_shmtx_t *mtx);
 
-
+//创建信号量
 ngx_int_t
 ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name)
 {
@@ -42,7 +42,7 @@ ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name)
     return NGX_OK;
 }
 
-
+//销毁信号量
 void
 ngx_shmtx_destroy(ngx_shmtx_t *mtx)
 {
@@ -58,14 +58,14 @@ ngx_shmtx_destroy(ngx_shmtx_t *mtx)
 #endif
 }
 
-
+//加锁
 ngx_uint_t
 ngx_shmtx_trylock(ngx_shmtx_t *mtx)
 {
     return (*mtx->lock == 0 && ngx_atomic_cmp_set(mtx->lock, 0, ngx_pid));
 }
 
-
+//加锁
 void
 ngx_shmtx_lock(ngx_shmtx_t *mtx)
 {
@@ -132,7 +132,7 @@ ngx_shmtx_lock(ngx_shmtx_t *mtx)
     }
 }
 
-
+//解锁
 void
 ngx_shmtx_unlock(ngx_shmtx_t *mtx)
 {
@@ -145,7 +145,7 @@ ngx_shmtx_unlock(ngx_shmtx_t *mtx)
     }
 }
 
-
+//解锁
 ngx_uint_t
 ngx_shmtx_force_unlock(ngx_shmtx_t *mtx, ngx_pid_t pid)
 {
@@ -198,7 +198,7 @@ ngx_shmtx_wakeup(ngx_shmtx_t *mtx)
 
 #else
 
-
+//文件锁
 ngx_int_t
 ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name)
 {

@@ -147,7 +147,7 @@ struct ngx_event_s {
 
 
 #if (NGX_HAVE_FILE_AIO)
-
+//异步io事件
 struct ngx_event_aio_s {
     void                      *data;
     ngx_event_handler_pt       handler;
@@ -176,21 +176,26 @@ struct ngx_event_aio_s {
 
 
 typedef struct {
+    //增加
     ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
+    //删除
     ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
-
+    //置为可用
     ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
+    //置为不可用
     ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
-
+    //增加连接
     ngx_int_t  (*add_conn)(ngx_connection_t *c);
+    //删除连接
     ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags);
-
+    //通知
     ngx_int_t  (*notify)(ngx_event_handler_pt handler);
-
+    //处理事件
     ngx_int_t  (*process_events)(ngx_cycle_t *cycle, ngx_msec_t timer,
                                  ngx_uint_t flags);
-
+    //初始化
     ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);
+    //执行
     void       (*done)(ngx_cycle_t *cycle);
 } ngx_event_actions_t;
 
@@ -425,7 +430,7 @@ extern ngx_os_io_t  ngx_io;
 #define NGX_EVENT_MODULE      0x544E5645  /* "EVNT" */
 #define NGX_EVENT_CONF        0x02000000
 
-
+//事件的配置
 typedef struct {
     ngx_uint_t    connections;
     ngx_uint_t    use;
@@ -496,12 +501,15 @@ void ngx_event_accept(ngx_event_t *ev);
 #if !(NGX_WIN32)
 void ngx_event_recvmsg(ngx_event_t *ev);
 #endif
+//获取accept的锁
 ngx_int_t ngx_trylock_accept_mutex(ngx_cycle_t *cycle);
 u_char *ngx_accept_log_error(ngx_log_t *log, u_char *buf, size_t len);
 
-
+//处理事件和定时器
 void ngx_process_events_and_timers(ngx_cycle_t *cycle);
+//处理读事件
 ngx_int_t ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags);
+//处理写事件
 ngx_int_t ngx_handle_write_event(ngx_event_t *wev, size_t lowat);
 
 

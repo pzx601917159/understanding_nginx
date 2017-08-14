@@ -8,7 +8,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//查找
 void *
 ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)
 {

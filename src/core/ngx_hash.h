@@ -25,10 +25,10 @@ typedef struct {
     ngx_uint_t        size;     //大小
 } ngx_hash_t;
 
-
+//hash通配元素
 typedef struct {
-    ngx_hash_t        hash;
-    void             *value;
+    ngx_hash_t        hash;//hash值
+    void             *value;//元素
 } ngx_hash_wildcard_t;
 
 //hash_key结构体
@@ -43,21 +43,21 @@ typedef ngx_uint_t (*ngx_hash_key_pt) (u_char *data, size_t len);
 
 
 typedef struct {
-    ngx_hash_t            hash;
-    ngx_hash_wildcard_t  *wc_head;
-    ngx_hash_wildcard_t  *wc_tail;
+    ngx_hash_t            hash;//hash元素
+    ngx_hash_wildcard_t  *wc_head;//头
+    ngx_hash_wildcard_t  *wc_tail;//尾
 } ngx_hash_combined_t;
 
 
 typedef struct {
-    ngx_hash_t       *hash;
-    ngx_hash_key_pt   key;
+    ngx_hash_t       *hash;//hash
+    ngx_hash_key_pt   key;//key
 
-    ngx_uint_t        max_size;
-    ngx_uint_t        bucket_size;
+    ngx_uint_t        max_size;//最大大小
+    ngx_uint_t        bucket_size;//存储元素的大小
 
-    char             *name;
-    ngx_pool_t       *pool;
+    char             *name;//名字
+    ngx_pool_t       *pool;//内存池
     ngx_pool_t       *temp_pool;
 } ngx_hash_init_t;
 
@@ -108,6 +108,7 @@ ngx_int_t ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
 ngx_int_t ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
     ngx_uint_t nelts);
 
+//产生hash key
 #define ngx_hash(key, c)   ((ngx_uint_t) key * 31 + c)
 ngx_uint_t ngx_hash_key(u_char *data, size_t len);
 ngx_uint_t ngx_hash_key_lc(u_char *data, size_t len);

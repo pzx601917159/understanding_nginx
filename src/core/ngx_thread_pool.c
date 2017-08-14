@@ -27,12 +27,12 @@ typedef struct {
 
 
 struct ngx_thread_pool_s {
-    ngx_thread_mutex_t        mtx;
-    ngx_thread_pool_queue_t   queue;
+    ngx_thread_mutex_t        mtx;//互斥量
+    ngx_thread_pool_queue_t   queue;//存储线程
     ngx_int_t                 waiting;
-    ngx_thread_cond_t         cond;
+    ngx_thread_cond_t         cond;//条件变量
 
-    ngx_log_t                *log;
+    ngx_log_t                *log;//日志
 
     ngx_str_t                 name;
     ngx_uint_t                threads;
@@ -42,24 +42,29 @@ struct ngx_thread_pool_s {
     ngx_uint_t                line;
 };
 
-
+//初始化
 static ngx_int_t ngx_thread_pool_init(ngx_thread_pool_t *tp, ngx_log_t *log,
     ngx_pool_t *pool);
+//销毁
 static void ngx_thread_pool_destroy(ngx_thread_pool_t *tp);
+//退出调用函数
 static void ngx_thread_pool_exit_handler(void *data, ngx_log_t *log);
-
+//重用
 static void *ngx_thread_pool_cycle(void *data);
+//线程函数
 static void ngx_thread_pool_handler(ngx_event_t *ev);
-
+//线程池
 static char *ngx_thread_pool(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-
+//创建配置
 static void *ngx_thread_pool_create_conf(ngx_cycle_t *cycle);
+//初始化配置
 static char *ngx_thread_pool_init_conf(ngx_cycle_t *cycle, void *conf);
-
+//初始化worker
 static ngx_int_t ngx_thread_pool_init_worker(ngx_cycle_t *cycle);
+//退出worker
 static void ngx_thread_pool_exit_worker(ngx_cycle_t *cycle);
 
-
+//命令
 static ngx_command_t  ngx_thread_pool_commands[] = {
 
     { ngx_string("thread_pool"),
@@ -72,7 +77,7 @@ static ngx_command_t  ngx_thread_pool_commands[] = {
       ngx_null_command
 };
 
-
+//定义模块的上下文
 static ngx_core_module_t  ngx_thread_pool_module_ctx = {
     ngx_string("thread_pool"),
     ngx_thread_pool_create_conf,
@@ -81,13 +86,13 @@ static ngx_core_module_t  ngx_thread_pool_module_ctx = {
 
 
 ngx_module_t  ngx_thread_pool_module = {
-    NGX_MODULE_V1,
-    &ngx_thread_pool_module_ctx,           /* module context */
-    ngx_thread_pool_commands,              /* module directives */
-    NGX_CORE_MODULE,                       /* module type */
-    NULL,                                  /* init master */
-    NULL,                                  /* init module */
-    ngx_thread_pool_init_worker,           /* init process */
+    NGX_MODULE_V1,//版本
+    &ngx_thread_pool_module_ctx,           /* module context *///上下文
+    ngx_thread_pool_commands,              /* module directives *///命令
+    NGX_CORE_MODULE,                       /* module type *///类型
+    NULL,                                  /* init master *///init_master毁掉函数
+    NULL,                                  /* init module *///init_moudle毁掉函数
+    ngx_thread_pool_init_worker,           /* init process *///下面是各种毁掉函数
     NULL,                                  /* init thread */
     NULL,                                  /* exit thread */
     ngx_thread_pool_exit_worker,           /* exit process */
@@ -116,13 +121,13 @@ ngx_thread_pool_init(ngx_thread_pool_t *tp, ngx_log_t *log, ngx_pool_t *pool)
                "the configured event method cannot be used with thread pools");
         return NGX_ERROR;
     }
-
+    //线程队列
     ngx_thread_pool_queue_init(&tp->queue);
-
+    //互斥锁
     if (ngx_thread_mutex_create(&tp->mtx, log) != NGX_OK) {
         return NGX_ERROR;
     }
-
+    //同步变量
     if (ngx_thread_cond_create(&tp->cond, log) != NGX_OK) {
         (void) ngx_thread_mutex_destroy(&tp->mtx, log);
         return NGX_ERROR;
@@ -145,7 +150,7 @@ ngx_thread_pool_init(ngx_thread_pool_t *tp, ngx_log_t *log, ngx_pool_t *pool)
         return NGX_ERROR;
     }
 #endif
-
+    //创建线程
     for (n = 0; n < tp->threads; n++) {
         err = pthread_create(&tid, &attr, ngx_thread_pool_cycle, tp);
         if (err) {
@@ -169,7 +174,7 @@ ngx_thread_pool_destroy(ngx_thread_pool_t *tp)
     volatile ngx_uint_t  lock;
 
     ngx_memzero(&task, sizeof(ngx_thread_task_t));
-
+    //退出handler
     task.handler = ngx_thread_pool_exit_handler;
     task.ctx = (void *) &lock;
 
@@ -186,13 +191,13 @@ ngx_thread_pool_destroy(ngx_thread_pool_t *tp)
 
         task.event.active = 0;
     }
-
+    //销毁条件变量
     (void) ngx_thread_cond_destroy(&tp->cond, tp->log);
-
+    //销毁互斥锁
     (void) ngx_thread_mutex_destroy(&tp->mtx, tp->log);
 }
 
-
+//退出线程的函数
 static void
 ngx_thread_pool_exit_handler(void *data, ngx_log_t *log)
 {
@@ -203,7 +208,7 @@ ngx_thread_pool_exit_handler(void *data, ngx_log_t *log)
     pthread_exit(0);
 }
 
-
+//分配线程任务
 ngx_thread_task_t *
 ngx_thread_task_alloc(ngx_pool_t *pool, size_t size)
 {
@@ -251,7 +256,7 @@ ngx_thread_task_post(ngx_thread_pool_t *tp, ngx_thread_task_t *task)
         (void) ngx_thread_mutex_unlock(&tp->mtx, tp->log);
         return NGX_ERROR;
     }
-
+    //插入task
     *tp->queue.last = task;
     tp->queue.last = &task->next;
 
@@ -266,7 +271,7 @@ ngx_thread_task_post(ngx_thread_pool_t *tp, ngx_thread_task_t *task)
     return NGX_OK;
 }
 
-
+//运行thread_pool
 static void *
 ngx_thread_pool_cycle(void *data)
 {
@@ -289,7 +294,7 @@ ngx_thread_pool_cycle(void *data)
     sigdelset(&set, SIGFPE);
     sigdelset(&set, SIGSEGV);
     sigdelset(&set, SIGBUS);
-
+    //以上的信号只在主线程中处理
     err = pthread_sigmask(SIG_BLOCK, &set, NULL);
     if (err) {
         ngx_log_error(NGX_LOG_ALERT, tp->log, err, "pthread_sigmask() failed");
@@ -344,7 +349,7 @@ ngx_thread_pool_cycle(void *data)
 
         *ngx_thread_pool_done.last = task;
         ngx_thread_pool_done.last = &task->next;
-
+        //内存屏障，保证上面的代码执行完成之后才执行下面的代码
         ngx_memory_barrier();
 
         ngx_unlock(&ngx_thread_pool_done_lock);
@@ -371,7 +376,7 @@ ngx_thread_pool_handler(ngx_event_t *ev)
     ngx_memory_barrier();
 
     ngx_unlock(&ngx_thread_pool_done_lock);
-
+    //执行task链表中的函数
     while (task) {
         ngx_log_debug1(NGX_LOG_DEBUG_CORE, ev->log, 0,
                        "run completion handler for task #%ui", task->id);
@@ -386,7 +391,7 @@ ngx_thread_pool_handler(ngx_event_t *ev)
     }
 }
 
-
+//分配内存
 static void *
 ngx_thread_pool_create_conf(ngx_cycle_t *cycle)
 {
@@ -423,7 +428,7 @@ ngx_thread_pool_init_conf(ngx_cycle_t *cycle, void *conf)
         if (tpp[i]->threads) {
             continue;
         }
-
+        //默认的配置
         if (tpp[i]->name.len == ngx_thread_pool_default.len
             && ngx_strncmp(tpp[i]->name.data, ngx_thread_pool_default.data,
                            ngx_thread_pool_default.len)
@@ -469,7 +474,7 @@ ngx_thread_pool(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     tp->max_queue = 65536;
 
     for (i = 2; i < cf->args->nelts; i++) {
-
+        //设置线程个数
         if (ngx_strncmp(value[i].data, "threads=", 8) == 0) {
 
             tp->threads = ngx_atoi(value[i].data + 8, value[i].len - 8);
@@ -482,7 +487,7 @@ ngx_thread_pool(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             continue;
         }
-
+        //设置最大任务数量
         if (ngx_strncmp(value[i].data, "max_queue=", 10) == 0) {
 
             tp->max_queue = ngx_atoi(value[i].data + 10, value[i].len - 10);
@@ -507,7 +512,7 @@ ngx_thread_pool(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//增加线程
 ngx_thread_pool_t *
 ngx_thread_pool_add(ngx_conf_t *cf, ngx_str_t *name)
 {
@@ -546,7 +551,7 @@ ngx_thread_pool_add(ngx_conf_t *cf, ngx_str_t *name)
     return tp;
 }
 
-
+//获取线程
 ngx_thread_pool_t *
 ngx_thread_pool_get(ngx_cycle_t *cycle, ngx_str_t *name)
 {
@@ -571,7 +576,7 @@ ngx_thread_pool_get(ngx_cycle_t *cycle, ngx_str_t *name)
     return NULL;
 }
 
-
+//初始化worker
 static ngx_int_t
 ngx_thread_pool_init_worker(ngx_cycle_t *cycle)
 {
@@ -605,7 +610,7 @@ ngx_thread_pool_init_worker(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+//退出worker
 static void
 ngx_thread_pool_exit_worker(ngx_cycle_t *cycle)
 {

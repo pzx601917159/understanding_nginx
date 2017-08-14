@@ -36,13 +36,18 @@ typedef struct {
     ngx_uint_t     spin;
 } ngx_shmtx_t;
 
-
+//创建共享mutex
 ngx_int_t ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr,
     u_char *name);
+//销毁共享mutex
 void ngx_shmtx_destroy(ngx_shmtx_t *mtx);
+//加锁
 ngx_uint_t ngx_shmtx_trylock(ngx_shmtx_t *mtx);
+//加锁
 void ngx_shmtx_lock(ngx_shmtx_t *mtx);
+//解锁
 void ngx_shmtx_unlock(ngx_shmtx_t *mtx);
+//强制加锁
 ngx_uint_t ngx_shmtx_force_unlock(ngx_shmtx_t *mtx, ngx_pid_t pid);
 
 

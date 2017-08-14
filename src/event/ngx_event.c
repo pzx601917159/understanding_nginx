@@ -842,7 +842,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+//设置触发发送低潮限度
 ngx_int_t
 ngx_send_lowat(ngx_connection_t *c, size_t lowat)
 {

@@ -16,14 +16,16 @@
 typedef struct {
     time_t      sec;
     ngx_uint_t  msec;
-    ngx_int_t   gmtoff;
+    ngx_int_t   gmtoff;//格林尼治时间
 } ngx_time_t;
 
-
+//初始化
 void ngx_time_init(void);
+//更新
 void ngx_time_update(void);
 void ngx_time_sigsafe_update(void);
 u_char *ngx_http_time(u_char *buf, time_t t);
+//cookie的时间
 u_char *ngx_http_cookie_time(u_char *buf, time_t t);
 void ngx_gmtime(time_t t, ngx_tm_t *tp);
 
@@ -46,6 +48,7 @@ extern volatile ngx_str_t    ngx_cached_syslog_time;
  * milliseconds elapsed since epoch and truncated to ngx_msec_t,
  * used in event timers
  */
+//当前的毫秒时间
 extern volatile ngx_msec_t  ngx_current_msec;
 
 

@@ -8,12 +8,12 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//创建链表
 ngx_list_t *
 ngx_list_create(ngx_pool_t *pool, ngx_uint_t n, size_t size)
 {
     ngx_list_t  *list;
-
+    //分配内存
     list = ngx_palloc(pool, sizeof(ngx_list_t));
     if (list == NULL) {
         return NULL;
@@ -26,7 +26,7 @@ ngx_list_create(ngx_pool_t *pool, ngx_uint_t n, size_t size)
     return list;
 }
 
-
+//获取插入元素的指针位置
 void *
 ngx_list_push(ngx_list_t *l)
 {
@@ -38,7 +38,7 @@ ngx_list_push(ngx_list_t *l)
     if (last->nelts == l->nalloc) {
 
         /* the last part is full, allocate a new list part */
-
+        //已经满了，重新分配内存
         last = ngx_palloc(l->pool, sizeof(ngx_list_part_t));
         if (last == NULL) {
             return NULL;
@@ -55,7 +55,7 @@ ngx_list_push(ngx_list_t *l)
         l->last->next = last;
         l->last = last;
     }
-
+    //得到元素的指针位置
     elt = (char *) last->elts + l->size * last->nelts;
     last->nelts++;
 

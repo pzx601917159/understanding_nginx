@@ -12,40 +12,40 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//链表
 typedef struct ngx_list_part_s  ngx_list_part_t;
 
 struct ngx_list_part_s {
-    void             *elts;
-    ngx_uint_t        nelts;
-    ngx_list_part_t  *next;
+    void             *elts;//元素
+    ngx_uint_t        nelts;//链表的当前长度
+    ngx_list_part_t  *next;//下一个
 };
 
 
 typedef struct {
     ngx_list_part_t  *last;
     ngx_list_part_t   part;
-    size_t            size;
+    size_t            size;//大小
     ngx_uint_t        nalloc;
-    ngx_pool_t       *pool;
+    ngx_pool_t       *pool;//内存池
 } ngx_list_t;
 
-
+//创建链表
 ngx_list_t *ngx_list_create(ngx_pool_t *pool, ngx_uint_t n, size_t size);
-
+//链表初始化
 static ngx_inline ngx_int_t
 ngx_list_init(ngx_list_t *list, ngx_pool_t *pool, ngx_uint_t n, size_t size)
-{
+{   //分配内存
     list->part.elts = ngx_palloc(pool, n * size);
     if (list->part.elts == NULL) {
         return NGX_ERROR;
     }
 
-    list->part.nelts = 0;
+    list->part.nelts = 0;//链表的当前长度
     list->part.next = NULL;
     list->last = &list->part;
-    list->size = size;
-    list->nalloc = n;
+    list->size = size;//size大小
+    list->nalloc = n;//单个节点的内存大小
     list->pool = pool;
 
     return NGX_OK;
@@ -76,7 +76,7 @@ ngx_list_init(ngx_list_t *list, ngx_pool_t *pool, ngx_uint_t n, size_t size)
  *  }
  */
 
-
+//插入
 void *ngx_list_push(ngx_list_t *list);
 
 

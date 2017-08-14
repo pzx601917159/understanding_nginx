@@ -7,24 +7,26 @@
 #ifndef _NGX_SYSLOG_H_INCLUDED_
 #define _NGX_SYSLOG_H_INCLUDED_
 
-
+//使用syslog
 typedef struct {
-    ngx_pool_t       *pool;
-    ngx_uint_t        facility;
+    ngx_pool_t       *pool;//内存池
+    ngx_uint_t        facility;//设置，只支持8个
     ngx_uint_t        severity;
     ngx_str_t         tag;
 
     ngx_addr_t        server;
-    ngx_connection_t  conn;
+    ngx_connection_t  conn;//连接
     unsigned          busy:1;
     unsigned          nohostname:1;
 } ngx_syslog_peer_t;
 
-
+//处理配置
 char *ngx_syslog_process_conf(ngx_conf_t *cf, ngx_syslog_peer_t *peer);
 u_char *ngx_syslog_add_header(ngx_syslog_peer_t *peer, u_char *buf);
+//写
 void ngx_syslog_writer(ngx_log_t *log, ngx_uint_t level, u_char *buf,
     size_t len);
+//发送
 ssize_t ngx_syslog_send(ngx_syslog_peer_t *peer, u_char *buf, size_t len);
 
 

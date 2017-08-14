@@ -17,17 +17,17 @@ ngx_radix_tree_create(ngx_pool_t *pool, ngx_int_t preallocate)
 {
     uint32_t           key, mask, inc;
     ngx_radix_tree_t  *tree;
-
+    //分配内存
     tree = ngx_palloc(pool, sizeof(ngx_radix_tree_t));
     if (tree == NULL) {
         return NULL;
     }
-
+    //初始化
     tree->pool = pool;
     tree->free = NULL;
     tree->start = NULL;
     tree->size = 0;
-
+    //为root分配内存
     tree->root = ngx_radix_alloc(tree);
     if (tree->root == NULL) {
         return NULL;
@@ -104,7 +104,7 @@ ngx_radix_tree_create(ngx_pool_t *pool, ngx_int_t preallocate)
     return tree;
 }
 
-
+//插入节点
 ngx_int_t
 ngx_radix32tree_insert(ngx_radix_tree_t *tree, uint32_t key, uint32_t mask,
     uintptr_t value)
@@ -116,7 +116,7 @@ ngx_radix32tree_insert(ngx_radix_tree_t *tree, uint32_t key, uint32_t mask,
 
     node = tree->root;
     next = tree->root;
-
+    //判断bit为1则插入右子树，否则插入左子树
     while (bit & mask) {
         if (key & bit) {
             next = node->right;
@@ -464,14 +464,14 @@ static ngx_radix_node_t *
 ngx_radix_alloc(ngx_radix_tree_t *tree)
 {
     ngx_radix_node_t  *p;
-
+    //有空先的节点直接返回空闲的节点
     if (tree->free) 
     {
         p = tree->free;
         tree->free = tree->free->right;
         return p;
     }
-
+    //分配内存
     if (tree->size < sizeof(ngx_radix_node_t)) 
     {
         tree->start = ngx_pmemalign(tree->pool, ngx_pagesize, ngx_pagesize);

@@ -70,7 +70,7 @@ ngx_syslog_process_conf(ngx_conf_t *cf, ngx_syslog_peer_t *peer)
     return NGX_CONF_OK;
 }
 
-
+//解析参数
 static char *
 ngx_syslog_parse_args(ngx_conf_t *cf, ngx_syslog_peer_t *peer)
 {

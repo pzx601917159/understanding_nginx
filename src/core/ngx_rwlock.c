@@ -12,7 +12,7 @@
 #if (NGX_HAVE_ATOMIC_OPS)
 
 
-#define NGX_RWLOCK_SPIN   2048
+#define NGX_RWLOCK_SPIN   2048//自旋的次数
 #define NGX_RWLOCK_WLOCK  ((ngx_atomic_uint_t) -1)
 
 
@@ -23,15 +23,19 @@ ngx_rwlock_wlock(ngx_atomic_t *lock)
 
     for ( ;; ) {
 
-        if (*lock == 0 && ngx_atomic_cmp_set(lock, 0, NGX_RWLOCK_WLOCK)) {
+        if (*lock == 0 && ngx_atomic_cmp_set(lock, 0, NGX_RWLOCK_WLOCK)) 
+        {
             return;
         }
 
-        if (ngx_ncpu > 1) {
+        if (ngx_ncpu > 1) 
+        {
 
-            for (n = 1; n < NGX_RWLOCK_SPIN; n <<= 1) {
+            for (n = 1; n < NGX_RWLOCK_SPIN; n <<= 1) 
+            {
 
                 for (i = 0; i < n; i++) {
+                    //加入pause指令可以加快cpu的速度
                     ngx_cpu_pause();
                 }
 
@@ -42,12 +46,12 @@ ngx_rwlock_wlock(ngx_atomic_t *lock)
                 }
             }
         }
-
+        //让出cpu
         ngx_sched_yield();
     }
 }
 
-
+//加写锁
 void
 ngx_rwlock_rlock(ngx_atomic_t *lock)
 {

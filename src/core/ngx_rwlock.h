@@ -13,8 +13,11 @@
 #include <ngx_core.h>
 
 //ngx读写锁
+//加读锁
 void ngx_rwlock_wlock(ngx_atomic_t *lock);
+//加写锁
 void ngx_rwlock_rlock(ngx_atomic_t *lock);
+//解锁
 void ngx_rwlock_unlock(ngx_atomic_t *lock);
 
 
